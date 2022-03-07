@@ -332,7 +332,19 @@ elif _system == 'Windows' or _system == 'CYGWIN':
         ('st_ctimespec', c_timespec),
         ('st_blksize', ctypes.c_int),
         ('st_blocks', ctypes.c_longlong),
-        ('st_birthtimespec', c_timespec)]
+        ('st_birthtimespec', c_timespec),
+        ('st_flags',ctypes.c_uint32)]
+    class fuse_conn_info(ctypes.Structure):
+        # compatible with FUSE 2.8; not compatible with FUSE 3.0!
+        _fields_ = [
+            ('proto_major', ctypes.c_uint),
+            ('proto_minor', ctypes.c_uint),
+            ('async_read', ctypes.c_uint),
+            ('max_write', ctypes.c_uint),
+            ('max_readahead', ctypes.c_uint),
+            ('capable', ctypes.c_uint),
+            ('want', ctypes.c_uint)]
+
 elif _system == 'OpenBSD':
     ENOTSUP = 91
     c_dev_t = ctypes.c_int32
@@ -598,7 +610,7 @@ class fuse_operations(ctypes.Structure):
             ctypes.c_int, ctypes.c_char_p, ctypes.c_int,
             ctypes.POINTER(fuse_file_info))),
 
-        ('init', ctypes.CFUNCTYPE(ctypes.c_voidp, ctypes.c_voidp)),
+        ('init', ctypes.CFUNCTYPE(ctypes.c_voidp, ctypes.POINTER(fuse_conn_info) if (_system == 'Windows' or _system == 'CYGWIN') else ctypes.c_voidp)),
         ('destroy', ctypes.CFUNCTYPE(ctypes.c_voidp, ctypes.c_voidp)),
 
         ('access', ctypes.CFUNCTYPE(
@@ -1115,6 +1127,8 @@ class FUSE:
                                            datasync, fip.contents.fh)
 
     def init(self, conn):
+        if _system == 'Windows' or _system == 'CYGWIN':
+            conn.contents.want |= (3<<22) #FSP_FUSE_CAP_STAT_EX, FSP_FUSE_CAP_READ_ONLY 
         return self.operations('init', '/')
 
     def destroy(self, private_data):
