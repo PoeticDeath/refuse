@@ -1128,7 +1128,7 @@ class FUSE:
 
     def init(self, conn):
         if _system == 'Windows' or _system == 'CYGWIN':
-            conn.contents.want |= (3<<22) #FSP_FUSE_CAP_STAT_EX, FSP_FUSE_CAP_READ_ONLY 
+            conn.contents.want |= (1<<23) #FSP_FUSE_CAP_STAT_EX
         return self.operations('init', '/')
 
     def destroy(self, private_data):
