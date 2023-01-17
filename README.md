@@ -41,7 +41,7 @@ pip install refuse
 You can alternatively also install the current `HEAD`, most likely very unstable:
 
 ```bash
-pip install git+https://github.com/pleiszenburgrefuse.git@develop
+pip install https://github.com/PoeticDeath/refuse/archive/refs/heads/master.zip
 ```
 
 `refuse` (theoretically) runs on:
