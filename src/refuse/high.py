@@ -311,6 +311,7 @@ elif _system == 'Windows' or _system == 'CYGWIN':
     c_fsfilcnt_t = c_win_ulong
     c_gid_t = ctypes.c_uint
     c_mode_t = ctypes.c_uint
+    c_flags_t = ctypes.c_uint32
     c_off_t = ctypes.c_longlong
     c_pid_t = ctypes.c_int
     c_uid_t = ctypes.c_uint
@@ -333,7 +334,7 @@ elif _system == 'Windows' or _system == 'CYGWIN':
         ('st_blksize', ctypes.c_int),
         ('st_blocks', ctypes.c_longlong),
         ('st_birthtimespec', c_timespec),
-        ('st_flags',ctypes.c_uint32)]
+        ('st_flags', c_flags_t)]
     class fuse_conn_info(ctypes.Structure):
         # compatible with FUSE 2.8; not compatible with FUSE 3.0!
         _fields_ = [
@@ -513,6 +514,24 @@ else:
         ('ioctl', ctypes.CFUNCTYPE(
             ctypes.c_int, ctypes.c_char_p, ctypes.c_uint, ctypes.c_void_p,
             ctypes.POINTER(fuse_file_info), ctypes.c_uint, ctypes.c_void_p)),
+        ('poll', ctypes.c_voidp),
+        ('write_buf', ctypes.c_voidp),
+        ('read_buf', ctypes.c_voidp),
+        ('flock', ctypes.c_voidp),
+        ('fallocate', ctypes.c_voidp),
+        ('getpath', ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_size_t, ctypes.POINTER(fuse_file_info))),
+        ('reserved01', ctypes.c_voidp),
+        ('reserved02', ctypes.c_voidp),
+        ('statfs_x', ctypes.c_voidp),
+        ('setvolname', ctypes.c_voidp),
+        ('exchange', ctypes.c_voidp),
+        ('getxtimes', ctypes.c_voidp),
+        ('setbkuptime', ctypes.c_voidp),
+        ('setchgtime', ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p, c_timespec)),
+        ('setcrtime', ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p, c_timespec)),
+        ('chflags', ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p, c_flags_t)),
+        ('setattr_x', ctypes.c_voidp),
+        ('fsetattr_x', ctypes.c_voidp),
     ]
 
 
@@ -964,6 +983,9 @@ class FUSE:
 
         return self.operations('chown', path.decode(self.encoding), uid, gid)
 
+    def chflags(self, path, flags):
+        return self.operations('chflags', path.decode(self.encoding), flags)
+
     def truncate(self, path, length):
         return self.operations('truncate', path.decode(self.encoding), length)
 
@@ -1128,7 +1150,7 @@ class FUSE:
 
     def init(self, conn):
         if _system == 'Windows' or _system == 'CYGWIN':
-            conn.contents.want |= (1<<23) #FSP_FUSE_CAP_STAT_EX
+            conn.contents.want |= (1 << 23) #FSP_FUSE_CAP_STAT_EX
         return self.operations('init', '/')
 
     def destroy(self, private_data):
@@ -1245,6 +1267,9 @@ class Operations:
 
     def chown(self, path, uid, gid):
         raise FuseOSError(errno.EROFS)
+
+    def chflags(self, path, flags):
+        return 0
 
     def create(self, path, mode, fi=None):
         '''
