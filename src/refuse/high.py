@@ -1178,6 +1178,12 @@ class FUSE:
         return self.operations('truncate', self._decode_optional_path(path),
                                            length, fh)
 
+    def setchgtime(self, path, time):
+        return self.operations('setchgtime', path.decode(self.encoding), time_of_timespec(time, self.use_ns))
+
+    def setcrtime(self, path, time):
+        return self.operations('setcrtime', path.decode(self.encoding), time_of_timespec(time, self.use_ns))
+
     def fgetattr(self, path, buf, fip):
         ctypes.memset(buf, 0, ctypes.sizeof(c_stat))
 
@@ -1413,6 +1419,12 @@ class Operations:
 
     def truncate(self, path, length, fh=None):
         raise FuseOSError(errno.EROFS)
+
+    def setchgtime(self, path, time):
+        return 0
+
+    def setcrtime(self, path, time):
+        return 0
 
     def unlink(self, path):
         raise FuseOSError(errno.EROFS)
