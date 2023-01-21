@@ -311,7 +311,6 @@ elif _system == 'Windows' or _system == 'CYGWIN':
     c_fsfilcnt_t = c_win_ulong
     c_gid_t = ctypes.c_uint
     c_mode_t = ctypes.c_uint
-    c_flags_t = ctypes.c_uint32
     c_off_t = ctypes.c_longlong
     c_pid_t = ctypes.c_int
     c_uid_t = ctypes.c_uint
@@ -334,7 +333,7 @@ elif _system == 'Windows' or _system == 'CYGWIN':
         ('st_blksize', ctypes.c_int),
         ('st_blocks', ctypes.c_longlong),
         ('st_birthtimespec', c_timespec),
-        ('st_flags', c_flags_t)]
+        ('st_flags', ctypes.c_uint32)]
     class fuse_conn_info(ctypes.Structure):
         # compatible with FUSE 2.8; not compatible with FUSE 3.0!
         _fields_ = [
@@ -529,7 +528,7 @@ else:
         ('setbkuptime', ctypes.c_voidp),
         ('setchgtime', ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p, c_timespec)),
         ('setcrtime', ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p, c_timespec)),
-        ('chflags', ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p, c_flags_t)),
+        ('chflags', ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p, ctypes.c_uint32)),
         ('setattr_x', ctypes.c_voidp),
         ('fsetattr_x', ctypes.c_voidp),
     ]
