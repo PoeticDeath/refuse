@@ -69,6 +69,8 @@ def get_libfuse(_system):
             _libfuse_path = Reg32GetValue(reg.HKEY_LOCAL_MACHINE, r"SOFTWARE\WinFsp", r"InstallDir")
             if _libfuse_path:
                 _libfuse_path += r"bin\winfsp-%s.dll" % ("x64" if sys.maxsize > 0xffffffff else "x86")
+            else:
+                _libfuse_path = os.getcwd()+r"\winfsp-%s.dll" % ("x64" if sys.maxsize > 0xffffffff else "x86")
         else:
             _libfuse_path = find_library('fuse')
 
