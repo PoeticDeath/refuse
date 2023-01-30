@@ -543,11 +543,11 @@ class fuse_operations(ctypes.Structure):
         ('getattr', ctypes.CFUNCTYPE(
             ctypes.c_int, ctypes.c_char_p, ctypes.POINTER(c_stat))),
 
+        ('getdir', ctypes.c_voidp),    # Deprecated, use readdir
+
         ('readlink', ctypes.CFUNCTYPE(
             ctypes.c_int, ctypes.c_char_p, ctypes.POINTER(ctypes.c_byte),
             ctypes.c_size_t)),
-
-        ('getdir', ctypes.c_voidp),    # Deprecated, use readdir
 
         ('mknod', ctypes.CFUNCTYPE(
             ctypes.c_int, ctypes.c_char_p, c_mode_t, c_dev_t)),
